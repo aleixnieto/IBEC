@@ -1,12 +1,12 @@
 ################################################################################
-# T?tol: Principal Component Analysis 
+# Títol: Principal Component Analysis 
 # Autor: Aleix Nieto
 # Fecha: 19/11/21
-# Descripci?n: Estudi estad?stic d'una base de dades amb diferents features de 
+# Descripción: Estudi estadístic d'una base de dades amb diferents features de 
 # ratolins proporcionada per IDIBAPS i IBEC
 ################################################################################
 
-# Instal?lem els paquets que farem servir
+# Instal·lem els paquets que farem servir
 # install.packages("corrplot")
 # install.packages("PerformanceAnalytics")
 # install.packages("FactorMineR")
@@ -22,12 +22,12 @@ library("factoextra")
 library("mice")
 library("naniar")
 # 1st way to read the dataframe
-# <- read.csv("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTAD?STIC RATOLINS/estudi_ratolins.csv", sep=";")
+# <- read.csv("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/estudi_ratolins.csv", sep=";")
 
 # 2nd way to read the dataframe
-# Webpage to remove "?.." that appears in the first variable when reading csv 
+# Webpage to remove "ï.." that appears in the first variable when reading csv 
 # https://www.roelpeters.be/removing-i-umlaut-two-dots-data-frame-column-read-csv/ 
-setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTAD?STIC RATOLINS/")
+setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
 dd <- read.table("estudi_ratolins.csv", header=T, sep=";", fileEncoding = 'UTF-8-BOM');
 
 # Identifiquem cada individu amb la columna label
@@ -37,15 +37,15 @@ identificador
 #Eliminem la columna dels labels ja que els hem posat coma a identificadors i no aporten res
 dd<-dd[,-2]
 
-# Mirem de quina classe s?n les variables
+# Mirem de quina classe són les variables
 sapply(dd,class)
 
-#Algunes caracter?stiques de la base de dades
+#Algunes característiques de la base de dades
 summary(dd)
 objects()
 attributes(dd)
 
-# Decralaci? de variables
+# Decralació de variables
 
 # Definim el tipus de variables
 v<-list(
@@ -56,12 +56,12 @@ v<-list(
 
 v$numeric<-c(v$integer,v$continua)
 
-# Descripci?n general
+# Descripción general
 summary(dd[,v$categoric])
 summary(dd[,v$numeric])
 
-# Convertim les variables en num?riques per poder aplicar el PCA, primer canviem totes les comes
-# dels decimals per punts i despr?s convertim en character per poder convertir en num?riques
+# Convertim les variables en numèriques per poder aplicar el PCA, primer canviem totes les comes
+# dels decimals per punts i després convertim en character per poder convertir en numèriques
 for(i in v$numeric) dd[,i]<-as.numeric(as.character(gsub(",",".",dd[,i],fixed=TRUE)))
 sapply(dd,class)
 
@@ -70,15 +70,15 @@ sapply(dd, function(x) sum(is.na(x)))
 
 # **Missing Imputation**
 # Simple imputation (mean)
-# Si no poso na.rm=TRUE i faig mean(dd[,i]) ens donar? NA perqu? hi ha missings, aleshores na.rm=TRUE
-# el que fa es eliminar les components TRUE del vector is.na(dd[,i]) que ?s TRUE si ?s missing i FALSE altrament.
+# Si no poso na.rm=TRUE i faig mean(dd[,i]) ens donarà NA perquè hi ha missings, aleshores na.rm=TRUE
+# el que fa es eliminar les components TRUE del vector is.na(dd[,i]) que és TRUE si és missing i FALSE altrament.
 #for(i in v$numeric) dd[,i][which(is.na(dd[,i]))]=mean(dd[,i], na.rm=TRUE)
 
-# Treballem amb la base de dades nom?s num?rica pel PCA, imputarem els missings en aquesta base ja que 
+# Treballem amb la base de dades només numèrica pel PCA, imputarem els missings en aquesta base ja que 
 # les variables que hem perdut definien els grups i no tenien missings
 dd.pca <- dd[,c(5:17)]
 
-# Visualitzaci? dels missings amb el package naniar <- https://cran.r-project.org/web/packages/naniar/vignettes/naniar-visualisation.html
+# Visualització dels missings amb el package naniar <- https://cran.r-project.org/web/packages/naniar/vignettes/naniar-visualisation.html
 # This plot provides a specific visualiation of the amount of missing data, showing in black the location of missing values, and also 
 # providing information on the overall percentage of missing values overall (in the legend), and in each variable.
 vis_miss(dd.pca)
@@ -87,12 +87,12 @@ vis_miss(dd.pca)
 
 # MICE imputation <- https://www.r-bloggers.com/2016/06/handling-missing-data-with-mice-package-a-simple-approach/
 #methods(mice)
-# No podem imputar nom?s fent: dd.pca = mice(dd, m=5) ja que dona un error Warning message:
+# No podem imputar només fent: dd.pca = mice(dd, m=5) ja que dona un error Warning message:
 # Number of logged events --> https://stefvanbuuren.name/fimd/sec-toomany.html; les variables
-# categ?riques tenen 0 valor predictiu i reelentitzen molt?ssim l'algorisme m?s altres coses que s'expliquen all?
+# categòriques tenen 0 valor predictiu i reelentitzen moltíssim l'algorisme més altres coses que s'expliquen allà
 #?mice
 
-# MIRAR B? IMPUTACI? AMB EL MICE A LA P?GINA ANTERIOR
+# MIRAR BÉ IMPUTACIÓ AMB EL MICE A LA PÀGINA ANTERIOR
 
 init = mice(dd.pca, maxit=0)
 # meth = init$method
