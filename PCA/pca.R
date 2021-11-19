@@ -13,7 +13,8 @@
 # install.packages("factoextra")
 # install.packages("mice")
 # install.packages("naniar")
-
+# install.packages("VIM")
+# install.packages("missForest")
 # Carreguem els paquets
 library("corrplot")
 library("PerformanceAnalytics")
@@ -21,6 +22,8 @@ library("FactoMineR")
 library("factoextra")
 library("mice")
 library("naniar")
+library("VIM")
+library("missForest")
 # 1st way to read the dataframe
 # <- read.csv("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/estudi_ratolins.csv", sep=";")
 
@@ -83,6 +86,7 @@ dd.pca <- dd[,c(5:17)]
 # providing information on the overall percentage of missing values overall (in the legend), and in each variable.
 vis_miss(dd.pca)
 
+gg_miss_upset(dd.pca)
 
 
 # MICE imputation <- https://www.r-bloggers.com/2016/06/handling-missing-data-with-mice-package-a-simple-approach/
