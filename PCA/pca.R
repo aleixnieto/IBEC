@@ -1,3 +1,5 @@
+#Tractar outliers, mirar-se lo random que són els missings, millorar mice, françoa pca
+
 ################################################################################
 # Títol: Principal Component Analysis 
 # Autor: Aleix Nieto
@@ -85,6 +87,13 @@ dd.pca <- dd[,c(5:17)]
 # This plot provides a specific visualiation of the amount of missing data, showing in black the location of missing values, and also 
 # providing information on the overall percentage of missing values overall (in the legend), and in each variable.
 vis_miss(dd.pca)
+md.pattern(dd.pca, plot=TRUE, rotate.names = FALSE)
+
+missplot <- aggr(dd.pca, col=c('aquamarine', 'olivedrab3'),
+                 numbers=TRUE, sortVars=TRUE,
+                 labels=names(dd.pca), cex.axis=.7,
+                 gap=3, ylab=c("Missing data","Pattern"))
+
 
 gg_miss_upset(dd.pca)
 
