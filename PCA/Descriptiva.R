@@ -1,15 +1,17 @@
 ################################################################################
-# Títol: Outlier treatment 
+# Títol: Descriptiva
 # Autor: Aleix Nieto
-# Fecha: 19/11/21
-# Descripción: Estudi estadístic d'una base de dades amb diferents features de 
+# Data: 19/11/21
+# Descripció: Estudi estadístic d'una base de dades amb diferents features de 
 # ratolins proporcionada per IDIBAPS i IBEC
 ################################################################################
-# install the package 
-# install.packages("ggstatsplot")
-# Load the package
-library(ggstatsplot)
 
+# 1st way to read the dataframe
+# <- read.csv("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/estudi_ratolins.csv", sep=";")
+
+# 2nd way to read the dataframe
+# Webpage to remove "ï.." that appears in the first variable when reading csv 
+# https://www.roelpeters.be/removing-i-umlaut-two-dots-data-frame-column-read-csv/ 
 setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
 dd <- read.table("estudi_ratolins.csv", header=T, sep=";", fileEncoding = 'UTF-8-BOM');
 
@@ -56,30 +58,20 @@ sapply(dd, function(x) sum(is.na(x)))
 # les variables que hem perdut definien els grups i no tenien missings
 dd.pca <- dd[,c(5:17)]
 
-
-# Create a boxplot of the dataset
-for (i in 1:length(dd.pca))boxplot(dd.pca[,i],main = names(dd.pca)[i], horizontal = TRUE)
-  
-remove_outliers <- function(x, na.rm = TRUE, ...) {
-  qnt <- quantile(x, probs=c(.25, .75), na.rm = na.rm, ...)
-  H <- 1.5 * IQR(x, na.rm = na.rm)
-  y <- x
-  y[x < (qnt[1] - H)] <- NA
-  y[x > (qnt[2] + H)] <- NA
-  y
-}
-
-for (i in 1:length(dd.pca)) dd.pca[,i] <- remove_outliers(dd.pca[,i])
-
-
-# https://stats.stackexchange.com/questions/58525/re-check-boxplot-after-outlier-removal
-for (i in 1:length(dd.pca))boxplot(dd.pca[,i],main = names(dd.pca)[i], horizontal = TRUE)
-
-
-# Veiem els missings de cada variable, veiem que els outliers ara són NA's
-sapply(dd.pca, function(x) sum(is.na(x)))
+# Visualització dels missings amb el package naniar <- https://cran.r-project.org/web/packages/naniar/vignettes/naniar-visualisation.html
+# This plot provides a specific visualiation of the amount of missing data, showing in black the location of missing values, and also 
+# providing information on the overall percentage of missing values overall (in the legend), and in each variable.
 vis_miss(dd.pca)
+md.pattern(dd.pca, plot=TRUE, rotate.names = FALSE)
 
-#saving the dataframe in an external file
-write.table(dd.pca, file = "dataclean.csv", sep = ",", na = "NA",row.names = TRUE, col.names = TRUE)
+missplot <- aggr(dd.pca, col=c('aquamarine', 'olivedrab3'),
+                 numbers=TRUE, sortVars=TRUE,
+                 labels=names(dd), cex.axis=.7,
+                 gap=3, ylab=c("Missing data","Pattern"))
 
+
+gg_miss_upset(dd.pca)
+
+
+# Veiem els missings de cada variable
+sapply(dd, function(x) sum(is.na(x)))
