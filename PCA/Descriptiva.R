@@ -10,10 +10,14 @@
 # <- read.csv("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/estudi_ratolins.csv", sep=";")
 
 # 2nd way to read the dataframe
-# Webpage to remove "ï.." that appears in the first variable when reading csv 
+# Webpage to remove "ï.." that appears in the first variable when reading csv -->
 # https://www.roelpeters.be/removing-i-umlaut-two-dots-data-frame-column-read-csv/ 
 setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
 dd <- read.table("estudi_ratolins.csv", header=T, sep=";", fileEncoding = 'UTF-8-BOM');
+#install.packages("reshape2")
+library("ggplot2")
+library("VIM")
+
 
 # Identifiquem cada individu amb la columna label
 row.names(dd)<-dd[,2]
@@ -54,6 +58,21 @@ sapply(dd,class)
 # Veiem els missings de cada variable
 sapply(dd, function(x) sum(is.na(x)))
 
+# https://medium.com/mlearning-ai/visualizing-continous-data-with-ggplot2-in-r-2e4b7f433f67
+for(i in names(dd)){
+ggplot(dd, aes(x=weight_gain)) + 
+  geom_histogram(binwidth=1, fill="#FF9999", color="#e9ecef", alpha=0.9) +
+  labs(title  = i)
+}
+k=5
+for(i in v$numeric){
+  p <- ggplot(dd, aes(x=dd[,i]))+ theme_minimal()+
+    geom_histogram(color="darkblue", fill="lightblue", bins=30)
+  
+  print(p + labs(title= "Histogram",
+          x = names(dd)[k], y = "Count")) 
+  k=k+1
+}
 # Visualització dels missings amb el package naniar <- https://cran.r-project.org/web/packages/naniar/vignettes/naniar-visualisation.html
 # This plot provides a specific visualiation of the amount of missing data, showing in black the location of missing values, and also 
 # providing information on the overall percentage of missing values overall (in the legend), and in each variable.
