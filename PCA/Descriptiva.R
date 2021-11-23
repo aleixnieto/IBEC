@@ -35,8 +35,8 @@ attributes(dd)
 
 # Definim el tipus de variables
 v<-list(
-  categoric=c('gender','diet','time'),
-  integer=c('group','final_auc','fasting_glucosa_final'),
+  categoric=c('gender','diet','time','group'),
+  integer=c('final_auc','fasting_glucosa_final'),
   continua=c('final_weight','weight_gain','LV_weight','LV_ratio','WAT_weight','WAT_ratio',
              'insulin_0_final','insulin_15_final','homa_ir','homa_beta','liver_trigly'))
 
@@ -54,24 +54,24 @@ sapply(dd,class)
 # Veiem els missings de cada variable
 sapply(dd, function(x) sum(is.na(x)))
 
-# Treballem amb la base de dades només numèrica pel PCA, imputarem els missings en aquesta base ja que 
-# les variables que hem perdut definien els grups i no tenien missings
-dd.pca <- dd[,c(5:17)]
-
 # Visualització dels missings amb el package naniar <- https://cran.r-project.org/web/packages/naniar/vignettes/naniar-visualisation.html
 # This plot provides a specific visualiation of the amount of missing data, showing in black the location of missing values, and also 
 # providing information on the overall percentage of missing values overall (in the legend), and in each variable.
-vis_miss(dd.pca)
-md.pattern(dd.pca, plot=TRUE, rotate.names = FALSE)
+vis_miss(dd)
+#?md.pattern
+#md.pattern(dd, plot=TRUE, rotate.names = TRUE)
 
-missplot <- aggr(dd.pca, col=c('aquamarine', 'olivedrab3'),
+missplot <- aggr(dd, col=c('aquamarine', 'olivedrab3'),
                  numbers=TRUE, sortVars=TRUE,
                  labels=names(dd), cex.axis=.7,
                  gap=3, ylab=c("Missing data","Pattern"))
 
 
-gg_miss_upset(dd.pca)
+gg_miss_upset(dd)
 
 
 # Veiem els missings de cada variable
 sapply(dd, function(x) sum(is.na(x)))
+
+#saving the dataframe in an external file
+write.table(dd, file = "datatopreprocess.csv", sep = ";", na = "NA",row.names = TRUE, col.names = TRUE)

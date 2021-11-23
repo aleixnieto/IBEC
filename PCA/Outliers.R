@@ -11,54 +11,21 @@
 library(ggstatsplot)
 
 setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
-dd <- read.table("estudi_ratolins.csv", header=T, sep=";", fileEncoding = 'UTF-8-BOM');
-
-# Identifiquem cada individu amb la columna label
-row.names(dd)<-dd[,2]
-# identificador <- row.names(dd)
-# identificador
-
-#Eliminem la columna dels labels ja que els hem posat coma a identificadors i no aporten res
-dd<-dd[,-2]
-
-# Mirem de quina classe són les variables
-sapply(dd,class)
-
-#Algunes característiques de la base de dades
-summary(dd)
-objects()
-attributes(dd)
+dd <- read.table("datatopreprocess.csv", header=T, sep=";", fileEncoding = 'UTF-8-BOM');
 
 # Decralació de variables
 
 # Definim el tipus de variables
 v<-list(
-  categoric=c('gender','diet','time'),
-  integer=c('group','final_auc','fasting_glucosa_final'),
+  categoric=c('gender','diet','time','group'),
+  integer=c('final_auc','fasting_glucosa_final'),
   continua=c('final_weight','weight_gain','LV_weight','LV_ratio','WAT_weight','WAT_ratio',
              'insulin_0_final','insulin_15_final','homa_ir','homa_beta','liver_trigly'))
 
 v$numeric<-c(v$integer,v$continua)
 
-# Descripción general
-summary(dd[,v$categoric])
-summary(dd[,v$numeric])
-
-# Convertim les variables en numèriques per poder aplicar el diferents métodes estadístics, primer canviem totes les comes
-# dels decimals per punts i després convertim en character per poder convertir en numèriques
-for(i in v$numeric) dd[,i]<-as.numeric(as.character(gsub(",",".",dd[,i],fixed=TRUE)))
-sapply(dd,class)
-
-# Veiem els missings de cada variable
-sapply(dd, function(x) sum(is.na(x)))
-
-# Treballem amb la base de dades només numèrica pel PCA, imputarem els missings en aquesta base ja que 
-# les variables que hem perdut definien els grups i no tenien missings
-dd.pca <- dd[,c(5:17)]
-
-
 # Create a boxplot of the dataset
-for (i in 1:length(dd.pca))boxplot(dd.pca[,i],main = names(dd.pca)[i], horizontal = TRUE)
+for (i in v$numeric) boxplot(dd[,i], main = names(dd)[i], horizontal = TRUE)
   
 remove_outliers <- function(x, na.rm = TRUE, ...) {
   qnt <- quantile(x, probs=c(.25, .75), na.rm = na.rm, ...)
@@ -69,17 +36,17 @@ remove_outliers <- function(x, na.rm = TRUE, ...) {
   y
 }
 
-for (i in 1:length(dd.pca)) dd.pca[,i] <- remove_outliers(dd.pca[,i])
+for (i in v$numeric) dd[,i] <- remove_outliers(dd[,i])
 
 
 # https://stats.stackexchange.com/questions/58525/re-check-boxplot-after-outlier-removal
-for (i in 1:length(dd.pca))boxplot(dd.pca[,i],main = names(dd.pca)[i], horizontal = TRUE)
+for (i in v$numeric)boxplot(dd[,i],main = names(dd)[i], horizontal = TRUE)
 
 
 # Veiem els missings de cada variable, veiem que els outliers ara són NA's
-sapply(dd.pca, function(x) sum(is.na(x)))
-vis_miss(dd.pca)
+sapply(dd, function(x) sum(is.na(x)))
+vis_miss(dd)
 
 #saving the dataframe in an external file
-write.table(dd.pca, file = "dataclean.csv", sep = ",", na = "NA",row.names = TRUE, col.names = TRUE)
+write.table(dd, file = "dataclean.csv", sep = ",", na = "NA",row.names = TRUE, col.names = TRUE)
 

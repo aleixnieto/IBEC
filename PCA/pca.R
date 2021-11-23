@@ -29,6 +29,15 @@ library("missForest")
 setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
 dd <- read.table("dataclean.csv", header=T, sep=",", fileEncoding = 'UTF-8-BOM');
 
+# Definim el tipus de variables
+v<-list(
+  categoric=c('gender','diet','time','group'),
+  integer=c('final_auc','fasting_glucosa_final'),
+  continua=c('final_weight','weight_gain','LV_weight','LV_ratio','WAT_weight','WAT_ratio',
+             'insulin_0_final','insulin_15_final','homa_ir','homa_beta','liver_trigly'))
+
+v$numeric<-c(v$integer,v$continua)
+
 # Veiem els missings de cada variable
 sapply(dd, function(x) sum(is.na(x)))
 
@@ -56,21 +65,24 @@ dd = mice(dd, m=5)
 dd <- complete(dd)
 sapply(dd, function(x) sum(is.na(x)))
 
+
+dd.pca <- dd[,v$numeric]
+
 # Correlation matrix
 # https://www.youtube.com/watch?v=qUmmATEJdgM&ab_channel=NurseKillam
 # https://courses.lumenlearning.com/introstats1/chapter/testing-the-significance-of-the-correlation-coefficient/
-cor.mat <- round(cor(dd),2)
+cor.mat <- round(cor(dd.pca),2)
 head(cor.mat)
 
 corrplot(cor.mat, type="upper", order="hclust", 
          tl.col="black", tl.srt=45)
 
-testRes = cor.mtest(dd, conf.level = 0.95)
+testRes = cor.mtest(dd.pca, conf.level = 0.95)
 
 corrplot(cor.mat, p.mat = testRes$p, method = 'circle', type = 'lower', insig='blank',
          addCoef.col ='black', number.cex = 0.55, order = 'AOE', diag=FALSE)
 # PCA
-res.pca <- PCA(dd, graph = FALSE)
+res.pca <- PCA(dd.pca, graph = FALSE)
 print(res.pca)
 
 eigenvalues <- res.pca$eig
@@ -124,14 +136,14 @@ fviz_pca_biplot(res.pca,  geom = "text")
 fviz_pca_ind(res.pca, label="none")
 
 
-fviz_pca_ind(res.pca,  label="none", habillage=as.factor(dd$gender))
+fviz_pca_ind(res.pca,  label="none", habillage=as.factor(dd$diet))
 
-fviz_pca_ind(res.pca, label="none", habillage=as.factor(dd$gender),
+fviz_pca_ind(res.pca, label="none", habillage=as.factor(dd$diet),
              addEllipses=TRUE, ellipse.level=0.95)
 
 
 fviz_pca_biplot(res.pca, 
-                habillage = as.factor(dd$gender), addEllipses = TRUE,
+                habillage = as.factor(dd$diet), addEllipses = TRUE,
                 col.var = "red", alpha.var ="cos2",
                 label = "var") +
   scale_color_brewer(palette="Dark2")+
