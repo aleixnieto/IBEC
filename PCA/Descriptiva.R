@@ -48,7 +48,7 @@ v<-list(
 # dels decimals per punts i després convertim en character per poder convertir en numèriques
 for(i in v$continua) dd[,i]<-as.numeric(as.character(gsub(",",".",dd[,i],fixed=TRUE)))
 for(i in v$categoric) dd[[i]]<-as.factor(dd[[i]])
-for(i in v$integer) d.e[[i]]<-as.integer(d.e[[i]])
+for(i in v$integer) dd[[i]]<-as.integer(dd[[i]])
 
 sapply(dd,class)
 
@@ -69,15 +69,18 @@ names(v$numeric)
 #   labs(title  = i))
 # }
 for(i in v$numeric){
-  p <- ggplot(dd, aes(x=dd[,i]))+ theme_minimal()+
+    png(file = paste0('C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/PLOTS/', i, ".","png"), bg = "transparent")
+    p <- ggplot(dd, aes(x=dd[,i]))+ theme_minimal()+
     geom_histogram(color="darkblue", fill="lightblue", bins=30)
   
   print(p + labs(title= i,
           x = names(dd)[which(names(dd)==i)], y = "Count")) 
+  dev.off()
 }
+?png
 #Veiem les taules de contingència de les variables categòriques
 for(i in v$categoric){
-  print(table(dd[,which(names(dd)==i)]))
+    print(table(dd[,which(names(dd)==i)]))
 }
 
 #Versió dels pie charts not that clean
@@ -86,14 +89,16 @@ for(i in v$categoric){
 #     legend(x = "topleft", legend = names(table(dd[,which(names(dd)==i)])),
 #            fill= 2:(length(names(table(dd[,which(names(dd)==i)])))+1), cex=0.8)
 # }
-
+suppressWarnings({ 
 require("RColorBrewer")
 for(i in v$categoric){
+  png(file = paste0('C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/PLOTS/', i, ".","png"), bg = "transparent")
   pie(table(dd[,which(names(dd)==i)]), radius = 1, col=brewer.pal(length(names(table(dd[,which(names(dd)==i)]))),'Spectral'))
   legend(x = "topleft", legend = names(table(dd[,which(names(dd)==i)])),
          fill=brewer.pal(length(names(table(dd[,which(names(dd)==i)]))),'Spectral'))
-}
-
+    dev.off()
+  }
+})
 # Visualització dels missings amb el package naniar <- https://cran.r-project.org/web/packages/naniar/vignettes/naniar-visualisation.html
 # This plot provides a specific visualiation of the amount of missing data, showing in black the location of missing values, and also 
 # providing information on the overall percentage of missing values overall (in the legend), and in each variable.
