@@ -18,7 +18,7 @@
 setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
 dd <- read.table("estudi_ratolins.csv", header=T, sep=";", fileEncoding = 'UTF-8-BOM', check.names = FALSE);
 library("ggplot2")
-library("labelled")
+library("naniar")
 # Identifiquem cada individu amb la columna label
 row.names(dd)<-dd[,2]
 # identificador <- row.names(dd)
@@ -72,8 +72,11 @@ for(i in v$numeric){
           x = names(dd)[which(names(dd)==i)], y = "Count")) 
 }
 #Veiem les taules de contingència de les variables categòriques
+for(i in v$categoric){
+  print(table(dd[,which(names(dd)==i)]))
+}
 
-#Versió dels pie charts no tan clean
+#Versió dels pie charts not that clean
 # for(i in v$categoric){
 #     pie(table(dd[,which(names(dd)==i)]), radius = 1, col = 2:(length(names(table(dd[,which(names(dd)==i)])))+1),labels=NA, angle = 45, density=NULL)
 #     legend(x = "topleft", legend = names(table(dd[,which(names(dd)==i)])),
@@ -86,9 +89,6 @@ for(i in v$categoric){
   legend(x = "topleft", legend = names(table(dd[,which(names(dd)==i)])),
          fill=brewer.pal(length(names(table(dd[,which(names(dd)==i)]))),'Spectral'))
 }
-
-?pie
-?legend
 
 # Visualització dels missings amb el package naniar <- https://cran.r-project.org/web/packages/naniar/vignettes/naniar-visualisation.html
 # This plot provides a specific visualiation of the amount of missing data, showing in black the location of missing values, and also 
