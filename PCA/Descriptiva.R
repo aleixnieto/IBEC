@@ -44,16 +44,20 @@ v<-list(
   continua=c('final_weight','weight_gain','LV_weight','LV_ratio','WAT_weight','WAT_ratio',
              'insulin_0_final','insulin_15_final','homa_ir','homa_beta','liver_trigly'))
 
+# Convertim les variables en numèriques per poder aplicar el diferents métodes estadístics, primer canviem totes les comes
+# dels decimals per punts i després convertim en character per poder convertir en numèriques
+for(i in v$continua) dd[,i]<-as.numeric(as.character(gsub(",",".",dd[,i],fixed=TRUE)))
+for(i in v$categoric) dd[[i]]<-as.factor(dd[[i]])
+for(i in v$integer) d.e[[i]]<-as.integer(d.e[[i]])
+
+sapply(dd,class)
+
+
 v$numeric<-c(v$integer,v$continua)
 
 # Descripción general
 summary(dd[,v$categoric])
 summary(dd[,v$numeric])
-
-# Convertim les variables en numèriques per poder aplicar el diferents métodes estadístics, primer canviem totes les comes
-# dels decimals per punts i després convertim en character per poder convertir en numèriques
-for(i in v$numeric) dd[,i]<-as.numeric(as.character(gsub(",",".",dd[,i],fixed=TRUE)))
-sapply(dd,class)
 
 # Veiem els missings de cada variable
 sapply(dd, function(x) sum(is.na(x)))
