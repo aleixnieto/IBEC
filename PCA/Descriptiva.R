@@ -73,17 +73,18 @@ for(i in v$numeric){
 }
 #Veiem les taules de contingència de les variables categòriques
 
-for(i in v$categoric){
-    pie(table(dd[,which(names(dd)==i)]), radius = 1, col = 2:(length(names(table(dd[,which(names(dd)==i)])))+1),labels=NA, angle = 45, density=NULL)
-    legend(x = "topleft", legend = names(table(dd[,which(names(dd)==i)])),
-           fill= 2:(length(names(table(dd[,which(names(dd)==i)])))+1), cex=0.8)
-}
+#Versió dels pie charts no tan clean
+# for(i in v$categoric){
+#     pie(table(dd[,which(names(dd)==i)]), radius = 1, col = 2:(length(names(table(dd[,which(names(dd)==i)])))+1),labels=NA, angle = 45, density=NULL)
+#     legend(x = "topleft", legend = names(table(dd[,which(names(dd)==i)])),
+#            fill= 2:(length(names(table(dd[,which(names(dd)==i)])))+1), cex=0.8)
+# }
 
 require("RColorBrewer")
 for(i in v$categoric){
-  pie(table(dd[,which(names(dd)==i)]), radius = 1, col=brewer.pal(length(names(table(dd[,which(names(dd)==i)])))),'Spectral')
+  pie(table(dd[,which(names(dd)==i)]), radius = 1, col=brewer.pal(length(names(table(dd[,which(names(dd)==i)]))),'Spectral'))
   legend(x = "topleft", legend = names(table(dd[,which(names(dd)==i)])),
-         fill=brewer.pal(length(names(table(dd[,which(names(dd)==i)]))),'Spectral'),cex=0.6)
+         fill=brewer.pal(length(names(table(dd[,which(names(dd)==i)]))),'Spectral'))
 }
 
 ?pie
