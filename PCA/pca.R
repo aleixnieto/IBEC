@@ -136,14 +136,14 @@ fviz_pca_biplot(res.pca,  geom = "text")
 fviz_pca_ind(res.pca, label="none")
 
 
-fviz_pca_ind(res.pca,  label="none", habillage=as.factor(dd$diet))
+fviz_pca_ind(res.pca,  label="none", habillage=as.factor(dd$time))
 
-fviz_pca_ind(res.pca, label="none", habillage=as.factor(dd$diet),
+fviz_pca_ind(res.pca, label="none", habillage=as.factor(dd$time),
              addEllipses=TRUE, ellipse.level=0.95)
 
 
 fviz_pca_biplot(res.pca, 
-                habillage = as.factor(dd$diet), addEllipses = TRUE,
+                habillage = as.factor(dd$time), addEllipses = TRUE,
                 col.var = "red", alpha.var ="cos2",
                 label = "var") +
   scale_color_brewer(palette="Dark2")+

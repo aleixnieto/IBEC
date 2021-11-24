@@ -12,13 +12,13 @@
 # 2nd way to read the dataframe
 # Webpage to remove "ï.." that appears in the first variable when reading csv -->
 # https://www.roelpeters.be/removing-i-umlaut-two-dots-data-frame-column-read-csv/ 
+# check.names: logical. If TRUE then the names of the variables in the data frame
+# are checked to ensure that they are syntactically valid variable names and are not duplicated.
+# En el nostre cas check.names no faria falta ja que tots els noms de les variables són vàlids(sense punts,espais,etc)
 setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
-dd <- read.table("estudi_ratolins.csv", header=T, sep=";", fileEncoding = 'UTF-8-BOM');
-#install.packages("reshape2")
+dd <- read.table("estudi_ratolins.csv", header=T, sep=";", fileEncoding = 'UTF-8-BOM', check.names = FALSE);
 library("ggplot2")
-library("VIM")
-
-
+library("labelled")
 # Identifiquem cada individu amb la columna label
 row.names(dd)<-dd[,2]
 # identificador <- row.names(dd)
@@ -57,22 +57,38 @@ sapply(dd,class)
 
 # Veiem els missings de cada variable
 sapply(dd, function(x) sum(is.na(x)))
-
+names(v$numeric)
 # https://medium.com/mlearning-ai/visualizing-continous-data-with-ggplot2-in-r-2e4b7f433f67
-for(i in names(dd)){
-ggplot(dd, aes(x=weight_gain)) + 
-  geom_histogram(binwidth=1, fill="#FF9999", color="#e9ecef", alpha=0.9) +
-  labs(title  = i)
-}
-k=5
+# for(i in names(dd)){
+# plot(ggplot(dd, aes(x=weight_gain)) + 
+#   geom_histogram(binwidth=1, fill="#FF9999", color="#e9ecef", alpha=0.9) +
+#   labs(title  = i))
+# }
 for(i in v$numeric){
   p <- ggplot(dd, aes(x=dd[,i]))+ theme_minimal()+
     geom_histogram(color="darkblue", fill="lightblue", bins=30)
   
-  print(p + labs(title= "Histogram",
-          x = names(dd)[k], y = "Count")) 
-  k=k+1
+  print(p + labs(title= i,
+          x = names(dd)[which(names(dd)==i)], y = "Count")) 
 }
+#Veiem les taules de contingència de les variables categòriques
+
+for(i in v$categoric){
+    pie(table(dd[,which(names(dd)==i)]), radius = 1, col = 2:(length(names(table(dd[,which(names(dd)==i)])))+1),labels=NA, angle = 45, density=NULL)
+    legend(x = "topleft", legend = names(table(dd[,which(names(dd)==i)])),
+           fill= 2:(length(names(table(dd[,which(names(dd)==i)])))+1), cex=0.8)
+}
+
+require("RColorBrewer")
+for(i in v$categoric){
+  pie(table(dd[,which(names(dd)==i)]), radius = 1, col=brewer.pal(length(names(table(dd[,which(names(dd)==i)])))),'Spectral')
+  legend(x = "topleft", legend = names(table(dd[,which(names(dd)==i)])),
+         fill=brewer.pal(length(names(table(dd[,which(names(dd)==i)]))),'Spectral'),cex=0.6)
+}
+
+?pie
+?legend
+
 # Visualització dels missings amb el package naniar <- https://cran.r-project.org/web/packages/naniar/vignettes/naniar-visualisation.html
 # This plot provides a specific visualiation of the amount of missing data, showing in black the location of missing values, and also 
 # providing information on the overall percentage of missing values overall (in the legend), and in each variable.
