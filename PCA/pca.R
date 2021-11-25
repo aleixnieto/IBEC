@@ -148,3 +148,6 @@ fviz_pca_biplot(res.pca,
                 label = "var") +
   scale_color_brewer(palette="Dark2")+
   theme_minimal()
+
+#saving the dataframe in an external file
+write.table(dd, file = "datapreprocessed.csv", sep = ",", na = "NA",row.names = TRUE, col.names = TRUE)
