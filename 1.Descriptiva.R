@@ -58,16 +58,13 @@ v$numeric<-c(v$integer,v$continua)
 # Descripción general
 summary(dd[,v$categoric])
 summary(dd[,v$numeric])
-?table
-table(dd[,4])
-summary(dd[,4])
-?summary
+
 # Veiem els missings de cada variable
 sapply(dd, function(x) sum(is.na(x)))
-names(v$numeric)
+v$numeric
 # https://medium.com/mlearning-ai/visualizing-continous-data-with-ggplot2-in-r-2e4b7f433f67
 # for(i in names(dd)){
-# plot(ggplot(dd, aes(x=weight_gain)) + 
+# plot(ggplot(dd, aes(x=weight_gain)) +
 #   geom_histogram(binwidth=1, fill="#FF9999", color="#e9ecef", alpha=0.9) +
 #   labs(title  = i))
 # }
@@ -80,10 +77,10 @@ for(i in v$numeric){
           x = names(dd)[which(names(dd)==i)], y = "Count")) 
   dev.off()
 }
-?png
+
 #Veiem les taules de contingència de les variables categòriques
 for(i in v$categoric){
-    print(table(dd[,which(names(dd)==i)]))
+  print(table(dd[,which(names(dd)==i)]))
 }
 
 #Versió dels pie charts not that clean
@@ -125,3 +122,4 @@ sapply(dd, function(x) sum(is.na(x)))
 
 #saving the dataframe in an external file
 write.table(dd, file = "datatopreprocess.csv", sep = ";", na = "NA",row.names = TRUE, col.names = TRUE)
+

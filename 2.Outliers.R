@@ -22,13 +22,19 @@ v<-list(
   continua=c('final_weight','weight_gain','LV_weight','LV_ratio','WAT_weight','WAT_ratio',
              'insulin_0_final','insulin_15_final','homa_ir','homa_beta','liver_trigly'))
 
+for(i in v$continua) dd[,i]<-as.numeric(as.character(gsub(",",".",dd[,i],fixed=TRUE)))
+for(i in v$categoric) dd[[i]]<-as.factor(dd[[i]])
+for(i in v$integer) dd[[i]]<-as.integer(dd[[i]])
+
 v$numeric<-c(v$integer,v$continua)
 
+
+
 # Create a boxplot of the dataset
-for (i in v$numeric) boxplot(dd[,i], main = names(dd)[i], horizontal = TRUE)
+for (i in v$numeric) boxplot(dd[,i], main = names(dd)[which(names(dd)==i)], horizontal = TRUE)
   
-remove_outliers <- function(x, na.rm = TRUE, ...) {
-  qnt <- quantile(x, probs=c(.25, .75), na.rm = na.rm, ...)
+remove_outliers <- function(x, na.rm = TRUE) {
+  qnt <- quantile(x, probs=c(.25, .75), na.rm = na.rm)
   H <- 1.5 * IQR(x, na.rm = na.rm)
   y <- x
   y[x < (qnt[1] - H)] <- NA
