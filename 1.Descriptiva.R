@@ -58,7 +58,10 @@ v$numeric<-c(v$integer,v$continua)
 # Descripción general
 summary(dd[,v$categoric])
 summary(dd[,v$numeric])
-
+?table
+table(dd[,4])
+summary(dd[,4])
+?summary
 # Veiem els missings de cada variable
 sapply(dd, function(x) sum(is.na(x)))
 names(v$numeric)
@@ -89,13 +92,15 @@ for(i in v$categoric){
 #     legend(x = "topleft", legend = names(table(dd[,which(names(dd)==i)])),
 #            fill= 2:(length(names(table(dd[,which(names(dd)==i)])))+1), cex=0.8)
 # }
+?legend
+?pie
 suppressWarnings({ 
 require("RColorBrewer")
 for(i in v$categoric){
   png(file = paste0('C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/PLOTS/', i, ".","png"), bg = "transparent")
-  pie(table(dd[,which(names(dd)==i)]), radius = 1, col=brewer.pal(length(names(table(dd[,which(names(dd)==i)]))),'Spectral'))
-  legend(x = "topleft", legend = names(table(dd[,which(names(dd)==i)])),
-         fill=brewer.pal(length(names(table(dd[,which(names(dd)==i)]))),'Spectral'))
+  pie(table(dd[,which(names(dd)==i)]), labels= NA, radius = 1, col=brewer.pal(length(names(table(dd[,which(names(dd)==i)]))),'Spectral'))
+  legend(x = "topleft",bty != "n", legend = names(table(dd[,which(names(dd)==i)])),
+         fill=brewer.pal(length(names(table(dd[,which(names(dd)==i)]))),'Spectral'),cex=1)
     dev.off()
   }
 })
