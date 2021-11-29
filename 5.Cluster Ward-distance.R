@@ -17,10 +17,13 @@ library(factoextra)
 
 # Clustering
 # Dissimilarity Matrix (Gower as we have mixed data)
+?daisy
+
 dissimMatrix <- daisy(dd[,actives], metric = "gower", stand=TRUE)
 distMatrix<-dissimMatrix^2
 
 # Clustering Ward Method
+?hclust
 h1 <- hclust(distMatrix,method="ward.D2")
 class(h1)
 str(h1)

@@ -29,12 +29,16 @@ library("missForest")
 setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
 dd <- read.table("dataclean.csv", header=T, sep=",", fileEncoding = 'UTF-8-BOM');
 
-# Definim el tipus de variables
+# Decralació de variables
 v<-list(
   categoric=c('gender','diet','time','group'),
   integer=c('final_auc','fasting_glucosa_final'),
   continua=c('final_weight','weight_gain','LV_weight','LV_ratio','WAT_weight','WAT_ratio',
              'insulin_0_final','insulin_15_final','homa_ir','homa_beta','liver_trigly'))
+
+for(i in v$continua) dd[,i]<-as.numeric(as.character(gsub(",",".",dd[,i],fixed=TRUE)))
+for(i in v$categoric) dd[[i]]<-as.factor(dd[[i]])
+for(i in v$integer) dd[[i]]<-as.integer(dd[[i]])
 
 v$numeric<-c(v$integer,v$continua)
 
