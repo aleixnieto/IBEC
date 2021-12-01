@@ -10,18 +10,34 @@ library(factoextra)
 # Comprovation of the preprocessing
 sapply(dd, function(x) sum(is.na(x)))
 
+# Decralació de variables
+v<-list(
+  categoric=c('gender','diet','time','group'),
+  integer=c('final_auc','fasting_glucosa_final'),
+  continua=c('final_weight','weight_gain','LV_weight','LV_ratio','WAT_weight','WAT_ratio',
+             'insulin_0_final','insulin_15_final','homa_ir','homa_beta','liver_trigly'))
+
+for(i in v$continua) dd[,i]<-as.numeric(as.character(gsub(",",".",dd[,i],fixed=TRUE)))
+for(i in v$categoric) dd[[i]]<-as.factor(dd[[i]])
+for(i in v$integer) dd[[i]]<-as.integer(dd[[i]])
+
+v$numeric<-c(v$integer,v$continua)
 
 # Clustering
 # Dissimilarity Matrix (Gower as we have mixed data)
 dissimMatrix <- daisy(dd[,actives], metric = "gower", stand=TRUE)
 distMatrix<-dissimMatrix^2
 
+
+#### k = 3
 # Clustering Ward Method
 h1 <- hclust(distMatrix,method="ward.D2")
-# class(h1)
-# str(h1)
+
+class(h1)
+str(h1)
 plot(h1, labels = F)
 rect.hclust(h1, k = 3, border = rainbow(8)) #[we cut at h = 1.5 but use k for efficiency reasons]
+
 
 # Cutting previous cluster
 k<-3
@@ -29,6 +45,39 @@ c2 <- cutree(h1,k)
 dd[,18]<- as.factor(c2)
 # Class sizes 
 table(c2)
+dd.pca <- dd[,v$numeric]
+res.pca <- PCA(dd.pca, graph = FALSE)
+
+# GROUP
+fviz_pca_ind(res.pca,  label="none", habillage=as.factor(dd$V18))
+
+fviz_pca_ind(res.pca, label="none", habillage=as.factor(dd$V18),
+             addEllipses=TRUE, ellipse.level=0.95)
+
+#### k = 2
+# Clustering Ward Method
+h1 <- hclust(distMatrix,method="ward.D2")
+
+class(h1)
+str(h1)
+plot(h1, labels = F)
+rect.hclust(h1, k = 2, border = rainbow(8))
+
+
+# Cutting previous cluster
+k<-2
+c2 <- cutree(h1,k)
+dd[,19]<- as.factor(c2)
+# Class sizes 
+table(c2)
+dd.pca <- dd[,v$numeric]
+res.pca <- PCA(dd.pca, graph = FALSE)
+
+# GROUP
+fviz_pca_ind(res.pca,  label="none", habillage=as.factor(dd$V19))
+
+fviz_pca_ind(res.pca, label="none", habillage=as.factor(dd$V19),
+             addEllipses=TRUE, ellipse.level=0.95)
 
 # Profiling
 # Calcula els valor test de la variable Xnum per totes les modalitats del factor P

@@ -42,6 +42,7 @@ fviz_nbclust(resnumclust)
 # Calculamos los dos clústers
 k2 <- kmeans(dd, centers = 3, nstart = 25)
 k2
+class(k2)
 str(k2)
 
 #plotear los cluster
