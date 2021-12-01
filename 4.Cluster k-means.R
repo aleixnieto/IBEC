@@ -39,8 +39,8 @@ fviz_nbclust(dd, kmeans, method = "gap_stat")
 resnumclust<-NbClust(dd, distance = "euclidean", min.nc=2, max.nc=10, method = "kmeans", index = "alllong")
 fviz_nbclust(resnumclust)
 
-#calculamos los dos clústers
-k2 <- kmeans(dd, centers = 2, nstart = 25)
+# Calculamos los dos clústers
+k2 <- kmeans(dd, centers = 3, nstart = 25)
 k2
 str(k2)
 
