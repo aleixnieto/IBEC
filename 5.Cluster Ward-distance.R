@@ -1,3 +1,4 @@
+#Posar encapçalament
 setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
 dd <- read.table("datapreprocessed.csv", header=T, sep=",", fileEncoding = 'UTF-8-BOM');
 dd[,1:4] <- lapply(dd[,1:4],as.factor);

@@ -1,3 +1,4 @@
+#Posar encapçalament
 #Cargar y utilizar función IPAK
 #ver vídeo https://www.youtube.com/watch?v=UjQz9SxG9rk
 #https://www.youtube.com/watch?v=7AFuL-1Q8eg&ab_channel=PabloVallejoMedina
