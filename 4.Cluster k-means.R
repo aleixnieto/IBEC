@@ -14,75 +14,83 @@ packages <- c("tidyverse","cluster", "factoextra","NbClust","tidyr")
 ipak(packages)
 
 setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
-dd <- read.table("datapreprocessed.csv", header=T, sep=",", fileEncoding = 'UTF-8-BOM');
-dd <- dd[,5:17]
+dd<- read.table("datapreprocessed.csv", header=T, sep=",", fileEncoding = 'UTF-8-BOM');
+dd.num <- dd[,5:17]
 
-#normalizar las puntuaciones
-dd <- scale(dd)
-head(dd)
+# Normalize data
+dd.num <- scale(dd.num)
+head(dd.num)
 
-#calcular la matriz de distacias
-m.distancia <- get_dist(dd, method = "euclidean") #el método aceptado también puede ser: "maximum", "manhattan", "canberra", "binary", "minkowski", "pearson", "spearman" o "kendall"
+# Distance matrix
+# We can also use these methods: "maximum", "manhattan", "canberra", "binary", "minkowski", "pearson", "spearman" o "kendall"
+m.distancia <- get_dist(dd.num, method = "euclidean") 
 fviz_dist(m.distancia, gradient = list(low = "blue", mid = "white", high = "red"))
 
-#estimar el número de clústers
-#Elbow, silhouette o gap_stat  method
-fviz_nbclust(dd, kmeans, method = "wss")
-fviz_nbclust(dd, kmeans, method = "silhouette")
-fviz_nbclust(dd, kmeans, method = "gap_stat")
+# Estimate the number of clusters
+# Elbow, silhouette o gap_stat  method
+fviz_nbclust(dd.num, kmeans, method = "wss")
+fviz_nbclust(dd.num, kmeans, method = "silhouette")
+fviz_nbclust(dd.num, kmeans, method = "gap_stat")
 
-#con esta función se pueden calcular:
+# Estimate the number of clusters with different methods
 #the index to be calculated. This should be one of : "kl", "ch", "hartigan", "ccc", "scott",
 #"marriot", "trcovw", "tracew", "friedman", "rubin", "cindex", "db", "silhouette", "duda",
 #"pseudot2", "beale", "ratkowsky", "ball", "ptbiserial", "gap", "frey", "mcclain", "gamma",
 #"gplus", "tau", "dunn", "hubert", "sdindex", "dindex", "sdbw", "all" (all indices except GAP,
 #Gamma, Gplus and Tau), "alllong" (all indices with Gap, Gamma, Gplus and Tau included).
-resnumclust<-NbClust(dd, distance = "euclidean", min.nc=2, max.nc=10, method = "kmeans", index = "alllong")
+resnumclust<-NbClust(dd.num, distance = "euclidean", min.nc=2, max.nc=10, method = "kmeans", index = "alllong")
 fviz_nbclust(resnumclust)
 
-# Calculamos los dos clústers
-k2 <- kmeans(dd, centers = 3, nstart = 25)
+# We calculate the clusters with k=2
+k2 <- kmeans(dd.num, centers = 2, nstart = 25)
+# Here we get all the information of the cluster, size, cluster of each individual
+# cluster mean for each variable, cluster vector, within cluster sum of squares,
+# between_SS / total_SS
 k2
-class(k2)
-str(k2)
 
-#plotear los cluster
-fviz_cluster(k2, data = dd)
-fviz_cluster(k2, data = dd, ellipse.type = "euclid",repel = TRUE,star.plot = TRUE) #ellipse.type= "t", "norm", "euclid"
-fviz_cluster(k2, data = dd, ellipse.type = "norm")
-fviz_cluster(k2, data = dd, ellipse.type = "norm",palette = "Set2", ggtheme = theme_minimal())
+# We calculate the clusters with k=3
+k3 <- kmeans(dd.num, centers = 3, nstart = 25)
+k3
+ 
+# Cluster plot
+fviz_cluster(k2, data = dd.num)
+fviz_cluster(k2, data = dd.num, ellipse.type = "euclid",repel = TRUE,star.plot = TRUE) #ellipse.type= "t", "norm", "euclid"
+fviz_cluster(k2, data = dd.num, ellipse.type = "norm")
+fviz_cluster(k2, data = dd.num, ellipse.type = "norm",palette = "Set2", ggtheme = theme_minimal())
 
-res2 <- hcut(dd, k = 2, stand = TRUE)
-fviz_dend(res2, rect = TRUE, cex = 0.5,
-          k_colors = c("red","#2E9Fdd"))
+fviz_cluster(k3, data = dd.num)
+fviz_cluster(k3, data = dd.num, ellipse.type = "euclid",repel = TRUE,star.plot = TRUE) #ellipse.type= "t", "norm", "euclid"
+fviz_cluster(k3, data = dd.num, ellipse.type = "norm")
+fviz_cluster(k3, data = dd.num, ellipse.type = "norm",palette = "Set2", ggtheme = theme_minimal())
 
-res4 <- hcut(dd, k = 4, stand = TRUE)
-fviz_dend(res4, rect = TRUE, cex = 0.5,
-          k_colors = c("red","#2E9Fdd","green","black"))
+res2 <- hcut(dd.num, k = 2, stand = TRUE)
+fviz_dend(res2, rect = TRUE, cex = 0.5, show_labels = FALSE, k_colors = c("red","#2E9Fdd"))
 
-# #pasar los cluster a mi dd inicial para trabajar con ellos
-# 
-# USArrests %>%
-#   mutate(Cluster = k2$cluster) %>%
-#   group_by(Cluster) %>%
-#   summarise_all("mean")
-# 
-# dd <- USArrests
-# dd
-# dd$clus<-as.factor(k2$cluster)
-# dd
-# 
-# dd <- USArrests
-# dd <- scale(dd)
-# dd<- as.data.frame(dd)
-# dd$clus<-as.factor(k2$cluster)
-# dd
-# 
-# dd$clus<-factor(dd$clus)
-# data_long <- gather(dd, caracteristica, valor, Murder:Rape, factor_key=TRUE)
-# data_long
-# 
-# ggplot(data_long, aes(as.factor(x = caracteristica), y = valor,group=clus, colour = clus)) + 
-#   stat_summary(fun = mean, geom="pointrange", size = 1)+
-#   stat_summary(geom="line")
-# #geom_point(aes(shape=clus))
+res3 <- hcut(dd.num, k = 3, stand = TRUE)
+fviz_dend(res3, rect = TRUE, cex = 0.5, show_labels = FALSE, k_colors = c("red","#2E9Fdd","green"))
+
+# Mean of each cluster for every variable
+dd.num <- dd[,5:17]
+dd.num %>%
+  mutate(Cluster = k2$cluster) %>%
+  group_by(Cluster) %>%
+  summarise_all("mean")
+
+# Pass the clusters to my initial dd.num to work with them
+dd$clus<-as.factor(k2$cluster)
+dd
+
+dd.num <- scale(dd.num)
+dd.num<- as.data.frame(dd.num)
+dd.num$clus<-as.factor(k2$cluster)
+dd.num
+
+dd.num$clus<-factor(dd.num$clus)
+data_long <- gather(dd.num, caracteristica, valor, final_weight:liver_trigly, factor_key=TRUE)
+data_long
+
+ggplot(data_long, aes(caracteristica, y = valor,group=clus, colour = clus)) +
+  stat_summary(fun = mean, geom="pointrange", size = 1)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  stat_summary(geom="line")
+geom_point(aes(shape=clus))

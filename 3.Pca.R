@@ -1,5 +1,3 @@
-#Tractar outliers, mirar-se lo random que són els missings, millorar mice, françoa pca
-
 ################################################################################
 # Títol: Principal Component Analysis 
 # Autor: Aleix Nieto
