@@ -1,17 +1,22 @@
-#Posar encapçalament
+################################################################################
+# Title: Hierarchical clustering
+# Author: Aleix Nieto
+# Date: 11/21 - 12/21
+# Description: Statistical study of a mice dataframe provided by IBAPS & IBEC
+################################################################################
+for(i in c("cluster","lattice", "FactoMineR", "factoextra")) require(i,character.only = T)
+
 setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
 dd <- read.table("datapreprocessed.csv", header=T, sep=",", fileEncoding = 'UTF-8-BOM');
 dd[,1:4] <- lapply(dd[,1:4],as.factor);
-sapply(dd,class)
 
+sapply(dd,class)
 actives<-c(1:length(dd))
-library(cluster)
-library(lattice)
-library(factoextra)
+
 # Comprovation of the preprocessing
 sapply(dd, function(x) sum(is.na(x)))
 
-# Decralació de variables
+# Variable declaration
 v<-list(
   categoric=c('gender','diet','time','group'),
   integer=c('final_auc','fasting_glucosa_final'),
@@ -29,64 +34,51 @@ v$numeric<-c(v$integer,v$continua)
 dissimMatrix <- daisy(dd[,actives], metric = "gower", stand=TRUE)
 distMatrix<-dissimMatrix^2
 
-
-#### k = 3
-# Clustering Ward Method
+# Clustering Ward Method, k=3
 h1 <- hclust(distMatrix,method="ward.D2")
-
 class(h1)
-str(h1)
 plot(h1, labels = F)
 rect.hclust(h1, k = 3, border = rainbow(8)) #[we cut at h = 1.5 but use k for efficiency reasons]
 
-
 # Cutting previous cluster
-k<-3
-c2 <- cutree(h1,k)
-dd[,18]<- as.factor(c2)
+c2 <- cutree(h1,3)
+dd$cluster<- as.factor(c2)
+
 # Class sizes 
 table(c2)
 dd.pca <- dd[,v$numeric]
 res.pca <- PCA(dd.pca, graph = FALSE)
 
 # GROUP
-fviz_pca_ind(res.pca,  label="none", habillage=as.factor(dd$V18))
+fviz_pca_ind(res.pca,  label="none", habillage=as.factor(dd$cluster))
 
-fviz_pca_ind(res.pca, label="none", habillage=as.factor(dd$V18),
+fviz_pca_ind(res.pca, label="none", habillage=as.factor(dd$cluster),
              addEllipses=TRUE, ellipse.level=0.95)
 
-#### k = 2
-# Clustering Ward Method
-h1 <- hclust(distMatrix,method="ward.D2")
-
-class(h1)
-str(h1)
-plot(h1, labels = F)
-rect.hclust(h1, k = 2, border = rainbow(8))
-
-
-# Cutting previous cluster
-k<-2
-c2 <- cutree(h1,k)
-dd[,19]<- as.factor(c2)
-# Class sizes 
-table(c2)
-dd.pca <- dd[,v$numeric]
-res.pca <- PCA(dd.pca, graph = FALSE)
-
-# GROUP
-fviz_pca_ind(res.pca,  label="none", habillage=as.factor(dd$V19))
-
-fviz_pca_ind(res.pca, label="none", habillage=as.factor(dd$V19),
-             addEllipses=TRUE, ellipse.level=0.95)
+# # Cutting previous cluster, k=2
+# rect.hclust(h1, k = 2, border = rainbow(8))
+# c2 <- cutree(h1,2)
+# dd$cluster_k_2<- as.factor(c2)
+# 
+# # Class sizes 
+# table(c2)
+# dd.pca <- dd[,v$numeric]
+# res.pca <- PCA(dd.pca, graph = FALSE)
+# 
+# # GROUP
+# fviz_pca_ind(res.pca,  label="none", habillage=as.factor(dd$cluster_k_2))
+# 
+# fviz_pca_ind(res.pca, label="none", habillage=as.factor(dd$cluster_k_2),
+#              addEllipses=TRUE, ellipse.level=0.95)
 
 # Profiling
+
 # Calcula els valor test de la variable Xnum per totes les modalitats del factor P
 ValorTestXnum <- function(Xnum,P){
-  #freq dis of fac
+  # nº of individuals in each cluster & total number of individuals
   nk <- as.vector(table(P)); 
   n <- sum(nk); 
-  # Mitjanes x grups
+  # Mean by group
   xk <- tapply(Xnum,P,mean);
   # Valors test
   txk <- (xk-mean(Xnum))/(sd(Xnum)*sqrt((n-nk)/(n*nk))); 
@@ -106,7 +98,7 @@ ValorTestXquali <- function(P,Xquali){
   pjm <- matrix(data=pj,nrow=dim(pf)[1],ncol=dim(pf)[2]);      
   dpf <- pf - pjm; 
   dvt <- sqrt(((1-pk)/(n*pk))%*%t(pj*(1-pj))); 
-  #i hi ha divisions iguals a 0 dona NA i no funciona
+  # If there are divisions equal to 0 it gives NA and it does not work
   zkj <- dpf
   zkj[dpf!=0]<-dpf[dpf!=0]/dvt[dpf!=0]; 
   pzkj <- pnorm(zkj,lower.tail=F);
@@ -114,10 +106,9 @@ ValorTestXquali <- function(P,Xquali){
   return (list(rowpf=pf,vtest=zkj,pval=pzkj))
 }
 
-#dades contain the dataset
+# Dades contain the dataset
 dades<-dd
 K<-dim(dades)[2]
-#par(ask=TRUE)
 P<-c2
 nc<-length(levels(factor(P)))
 pvalk <- matrix(data=0,nrow=nc,ncol=K, dimnames=list(levels(P),names(dades)))
@@ -126,14 +117,14 @@ n<-dim(dades)[1]
 
 for(k in 1:(K-1)){
   if (is.numeric(dades[,k])){ 
-    print(paste("An?lisi per classes de la Variable:", names(dades)[k]))
+    print(paste("Analysis by class of the variable:", names(dades)[k]))
     
     boxplot(dades[,k]~P, main=paste("Boxplot of", names(dades)[k], "vs", nameP ), horizontal=TRUE)
     
     barplot(tapply(dades[[k]], P, mean),main=paste("Means of", names(dades)[k], "by", nameP ))
     abline(h=mean(dades[[k]]))
     legend(0,mean(dades[[k]]),"global mean",bty="n")
-    print("Estad?stics per groups:")
+    print("Statistics per groups:")
     for(s in levels(as.factor(P))) {print(summary(dades[P==s,k]))}
     o<-oneway.test(dades[,k]~P)
     print(paste("p-valueANOVA:", o$p.value))
@@ -143,13 +134,7 @@ for(k in 1:(K-1)){
     print("p-values ValorsTest: ")
     print(pvalk[,k])      
   }else{
-    if(class(dd[,k])=="Date"){
-      print(summary(dd[,k]))
-      print(sd(dd[,k]))
-      #decide breaks: weeks, months, quarters...
-      hist(dd[,k],breaks="weeks")
-    }else{
-      #qualitatives
+    #qualitatives
       print(paste("Variable", names(dades)[k]))
       table<-table(P,dades[,k])
       #   print("Cross-table")
@@ -157,11 +142,11 @@ for(k in 1:(K-1)){
       rowperc<-prop.table(table,1)
       
       colperc<-prop.table(table,2)
-      #  print("Distribucions condicionades a files")
+      #  print("Distributioned conditioned to files")
       # print(rowperc)
       
-      #ojo porque si la variable es true o false la identifica amb el tipus Logical i
-      #aquest no te levels, por tanto, coertion preventiva
+      # Be careful because if the feature is true or false, it is identified
+      # with the type Logical, this does not have levels -> preventive coertion 
       
       dades[,k]<-as.factor(dades[,k])
       
@@ -169,20 +154,20 @@ for(k in 1:(K-1)){
       marg <- table(as.factor(P))/n
       print(append("Categories=",levels(as.factor(dades[,k]))))
       
-      #from next plots, select one of them according to your practical case with legend
+      # From next plots, select one of them according to your practical case with legend
       plot(marg,type="l",ylim=c(0,1),main=paste("Proportion by",names(dades)[k]))
       paleta<-rainbow(length(levels(dades[,k])))
       for(c in 1:length(levels(dades[,k]))){lines(colperc[,c],col=paleta[c]) }
       legend("topright", levels(dades[,k]), col=paleta, lty=2, cex=0.6)
       
-      #condicionades a classes with legend
+      # Conditioned to classes with legend
       print(append("Categories=",levels(dades[,k])))
       plot(marg,type="n",ylim=c(0,1),main=paste("Proportion by",names(dades)[k]))
       paleta<-rainbow(length(levels(dades[,k])))
       for(c in 1:length(levels(dades[,k]))){lines(rowperc[,c],col=paleta[c]) }
       legend("topright", levels(dades[,k]), col=paleta, lty=2, cex=0.6)
       
-      #amb variable en eix d'abcisses with legend
+      # With variables in the x axis with legend
       marg <-table(dades[,k])/n
       print(append("Categories=",levels(dades[,k])))
       plot(marg,type="l",ylim=c(0,1),main=paste("Proportion by",names(dades)[k]), las=3)
@@ -192,7 +177,7 @@ for(k in 1:(K-1)){
       for(c in 1:length(levels(as.factor(P)))){lines(rowperc[c,],col=paleta[c]) }
       legend("topright", levels(as.factor(P)), col=paleta, lty=2, cex=0.6)      
       
-      #condicionades a columna with legend
+      # Conditioned to column with legend
       plot(marg,type="n",ylim=c(0,1),main=paste("Proportion by",names(dades)[k]), las=3)
       paleta<-rainbow(length(levels(as.factor(P))))
       for(c in 1:length(levels(as.factor(P)))){lines(colperc[c,],col=paleta[c]) }
@@ -201,16 +186,16 @@ for(k in 1:(K-1)){
       table<-table(dades[,k],P)
       print("Cross Table:")
       print(table)
-      print("Distribucions condicionades a columnes:")
+      print("Distributions conditioned to columns:")
       print(colperc)
       
-      #diagrames de barres apilades                                         
+      # Applied bar charts                                         
       
       paleta<-rainbow(length(levels(dades[,k])))
       barplot(table(dades[,k], as.factor(P)), beside=FALSE,col=paleta, main=paste("Frequency by",names(dades)[k]) )
       legend("topright",levels(as.factor(dades[,k])),pch=1,cex=0.5, col=paleta)
       
-      #diagrames de barres adosades
+      # Attached bar charts
       
       barplot(table(dades[,k], as.factor(P)), beside=TRUE,col=paleta, main=paste("Frequency by",names(dades)[k]))
       legend("topright",levels(as.factor(dades[,k])),pch=1,cex=0.5, col=paleta)
@@ -220,29 +205,5 @@ for(k in 1:(K-1)){
       
       print("valorsTest:")
       print( ValorTestXquali(P,dades[,k]))
-      #calcular els pvalues de les quali
-    }
+      }
   }
-}
-
-##Estadísticos
-levnames <- c(names(dades)[1:8], unlist(lapply(dd[,9:21],function(x) levels(x)), use.names = F))
-pvalk <- matrix(data=0,nrow=nc,ncol=length(levnames), dimnames=list(levels(P),levnames))
-counter <- 1
-for(i in names(dades)[1:21]){
-  if (is.numeric(dades[[i]])){
-    pvalk[,counter]<-ValorTestXnum(dades[[i]], P)
-    counter <- counter + 1
-  }else{
-    nl <- nlevels(dades[[i]])
-    counter2 <- counter + nl - 1
-    pvalk[,counter:counter2]<-ValorTestXquali(P,dades[[i]])$pval
-    counter <- counter2 + 1    
-  }
-}
-for (c in 1:length(levels(as.factor(P)))) {
-  if(!is.na(levels(as.factor(P))[c])){
-    print(paste("P.values per class:",levels(as.factor(P))[c]));
-    print(sort(pvalk[c,]), digits=5) 
-  }
-}
