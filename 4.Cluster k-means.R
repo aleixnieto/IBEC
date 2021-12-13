@@ -1,4 +1,10 @@
-#Posar encapçalament
+################################################################################
+# Title: k-means clustering
+# Author: Aleix Nieto
+# Date: 11/21 - 12/21
+# Description: Statistical study of a mice dataframe provided by IBAPS & IBEC
+################################################################################
+
 #Cargar y utilizar función IPAK
 #ver vídeo https://www.youtube.com/watch?v=UjQz9SxG9rk
 #https://www.youtube.com/watch?v=7AFuL-1Q8eg&ab_channel=PabloVallejoMedina
@@ -89,7 +95,7 @@ dd.num$clus<-factor(dd.num$clus)
 data_long <- gather(dd.num, caracteristica, valor, final_weight:liver_trigly, factor_key=TRUE)
 data_long
 
-ggplot(data_long, aes(caracteristica, y = valor,group=clus, colour = clus)) +
+ggplot(data_long, aes(feature, y = value,group=clus, colour = clus)) +
   stat_summary(fun = mean, geom="pointrange", size = 1)+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   stat_summary(geom="line")
