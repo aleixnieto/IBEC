@@ -2,7 +2,7 @@
 # Title: Outlier treatment
 # Author: Aleix Nieto
 # Date: 19/11/21
-# Description:
+# Description: Outlier detection and total missings overview
 ################################################################################
 
 # install the package ggstatsplot
