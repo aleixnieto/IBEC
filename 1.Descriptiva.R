@@ -1,5 +1,5 @@
 ################################################################################
-# Títol: Descriptiva
+# Títol: Descriptive analysis
 # Autor: Aleix Nieto
 # Data: 19/11/21
 # Descripció: Estudi estadístic d'una base de dades amb diferents features de 
@@ -15,7 +15,7 @@
 # check.names: logical. If TRUE then the names of the variables in the data frame
 # are checked to ensure that they are syntactically valid variable names and are not duplicated.
 # En el nostre cas check.names no faria falta ja que tots els noms de les variables són vàlids(sense punts,espais,etc)
-setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
+setwd("C:/Users/garys/Desktop/PRACTIQUES/MICE STATISTICAL ANALYSIS/DATAFRAMES GENERATED/")
 dd <- read.table("estudi_ratolins.csv", header=T, sep=";", fileEncoding = 'UTF-8-BOM', check.names = FALSE);
 library("ggplot2")
 library("naniar")
