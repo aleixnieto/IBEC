@@ -1,12 +1,12 @@
 ################################################################################
-# Títol: Principal Component Analysis 
-# Autor: Aleix Nieto
-# Fecha: 19/11/21
-# Descripción: Estudi estadístic d'una base de dades amb diferents features de 
-# ratolins proporcionada per IDIBAPS i IBEC
+# Title: PCA
+# Author: Aleix Nieto
+# Date: 19/11/21
+# Description: Missing imputation, correlation matrix and detailed PCA with 
+# categorical variables plotted in the first two PCA dimensions
 ################################################################################
 
-# Instal·lem i carreguem els paquets que farem servir
+# Install and load packages that we will use
 ipak <- function(pkg){
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg)) 
@@ -17,10 +17,10 @@ ipak <- function(pkg){
 packages <- c("corrplot","PerformanceAnalytics", "FactoMineR", "factoextra","mice","naniar", "VIM","missForest")
 ipak(packages)
 
-setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
+setwd("C:/Users/garys/Desktop/PRACTIQUES/MICE STATISTICAL ANALYSIS/DATAFRAMES GENERATED/")
 dd <- read.table("dataclean.csv", header=T, sep=",", fileEncoding = 'UTF-8-BOM');
 
-# Decralació de variables
+# Variable declaration
 v<-list(
   categoric=c('gender','diet','time','group'),
   integer=c('final_auc','fasting_glucosa_final'),
@@ -33,25 +33,24 @@ for(i in v$integer) dd[[i]]<-as.integer(dd[[i]])
 
 v$numeric<-c(v$integer,v$continua)
 
-# Veiem els missings de cada variable
+# Missings of each variable
 sapply(dd, function(x) sum(is.na(x)))
 
 # **Missing Imputation**
 # Simple imputation (mean)
-# Si no poso na.rm=TRUE i faig mean(dd[,i]) ens donarà NA perquè hi ha missings, aleshores na.rm=TRUE
-# el que fa es eliminar les components TRUE del vector is.na(dd[,i]) que és TRUE si és missing i FALSE altrament.
+# If I do not put na.rm=TRUE and i write mean(dd[,i]) we will be given NA because there are missings, 
+# so na.rm=TRUE what it does is delete the TRUE components of the vector is.na(dd[,i]) which is TRUE 
+# if it is a missing and FALSE otherwise
 
 #for(i in v$numeric) dd[,i][which(is.na(dd[,i]))]=mean(dd[,i], na.rm=TRUE)
 
 # MICE imputation <- https://www.r-bloggers.com/2016/06/handling-missing-data-with-mice-package-a-simple-approach/
 #methods(mice)
-# No podem imputar només fent: dd = mice(dd, m=5) ja que dona un error Warning message:
-# Number of logged events --> https://stefvanbuuren.name/fimd/sec-toomany.html; les variables
-# categòriques tenen 0 valor predictiu i reelentitzen moltíssim l'algorisme més altres coses que s'expliquen allà
-#?mice
+# We can't imput only doing: dd = mice(dd, m=5) because we get an error warning message message:
+# CHECK THIS WEBPAGE!! IMPORTANT!!# Number of logged events --> https://stefvanbuuren.name/fimd/sec-toomany.html; les variables
+# Categorical have 0 predictive value and they slow down a lot the algorism and other things that are explained in the link
 
-# MIRAR BÉ IMPUTACIÓ AMB EL MICE A LA PÀGINA ANTERIOR
-
+?mice
 init = mice(dd, maxit=0)
 # meth = init$method
 # predM = init$predictorMatrix
@@ -62,7 +61,7 @@ dd = mice(dd, m=5)
 dd <- complete(dd)
 sapply(dd, function(x) sum(is.na(x)))
 
-
+# PCA dataframe, we only use the numerical variables
 dd.pca <- dd[,v$numeric]
 
 # Correlation matrix
@@ -85,7 +84,6 @@ corrplot(cor.mat, p.mat = testRes$p, method = 'circle',
          type = 'lower', insig='blank', addCoef.col ='black',
          number.cex = 0.55, order = 'AOE', diag=FALSE)
 # PCA
-
 res.pca <- PCA(dd.pca, graph = FALSE)
 print(res.pca)
 
@@ -204,5 +202,6 @@ fviz_pca_biplot(res.pca,
   scale_color_brewer(palette="Dark2")+
   theme_minimal()
 
-#saving the dataframe in an external file
+# Saving the dataframe in an external file
 write.table(dd, file = "datapreprocessed.csv", sep = ",", na = "NA",row.names = TRUE, col.names = TRUE)
+
