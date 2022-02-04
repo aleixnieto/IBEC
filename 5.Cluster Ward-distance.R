@@ -1,12 +1,13 @@
 ################################################################################
 # Title: Hierarchical clustering
 # Author: Aleix Nieto
-# Date: 11/21 - 12/21
-# Description: Statistical study of a mice dataframe provided by IBAPS & IBEC
+# Date: 12/21 - 1/22
+# Description: Hierarchical clustering with dendongram and statistical tests
 ################################################################################
+
 for(i in c("cluster","lattice", "FactoMineR", "factoextra")) require(i,character.only = T)
 
-setwd("C:/Users/garys/Desktop/PRACTIQUES/ESTUDI ESTADÍSTIC RATOLINS/")
+setwd("C:/Users/garys/Desktop/PRACTIQUES/MICE STATISTICAL ANALYSIS/DATAFRAMES GENERATED/")
 dd <- read.table("datapreprocessed.csv", header=T, sep=",", fileEncoding = 'UTF-8-BOM');
 dd[,1:4] <- lapply(dd[,1:4],as.factor);
 
@@ -44,6 +45,9 @@ rect.hclust(h1, k = 3, border = rainbow(8)) #[we cut at h = 1.5 but use k for ef
 c2 <- cutree(h1,3)
 dd$cluster<- as.factor(c2)
 
+# Saving the dataframe in an external file
+write.table(dd, file = "clusters.csv", sep = ",", na = "NA",row.names = TRUE, col.names = TRUE)
+
 # Class sizes 
 table(c2)
 dd.pca <- dd[,v$numeric]
@@ -73,14 +77,14 @@ fviz_pca_ind(res.pca, label="none", habillage=as.factor(dd$cluster),
 
 # Profiling
 
-# Calcula els valor test de la variable Xnum per totes les modalitats del factor P
+# It calculates the test values of each variable for all the modalities of the factor P
 ValorTestXnum <- function(Xnum,P){
   # nº of individuals in each cluster & total number of individuals
   nk <- as.vector(table(P)); 
   n <- sum(nk); 
   # Mean by group
   xk <- tapply(Xnum,P,mean);
-  # Valors test
+  # Test values
   txk <- (xk-mean(Xnum))/(sd(Xnum)*sqrt((n-nk)/(n*nk))); 
   # p-values
   pxk <- pt(txk,n-1,lower.tail=F);
@@ -106,7 +110,6 @@ ValorTestXquali <- function(P,Xquali){
   return (list(rowpf=pf,vtest=zkj,pval=pzkj))
 }
 
-# Dades contain the dataset
 dades<-dd
 K<-dim(dades)[2]
 P<-c2
@@ -206,4 +209,4 @@ for(k in 1:(K-1)){
       print("valorsTest:")
       print( ValorTestXquali(P,dades[,k]))
       }
-  }
+}
